@@ -3,7 +3,7 @@
 
 #include "comDef.h"
 
-#define ADF4351_CLOCKFREQ				50 // MHz
+#define ADF4351_CLOCKREF				50.0f // MHz
 
 // Multiplexer output (unused)
 #define ADF4351_MUXOUT_PORT				GPIOC
@@ -113,9 +113,9 @@
 #define ADF4351_LDPINMODE_DIGITALLD		1
 #define ADF4351_LDPINMODE_HIGH			3
 
-#define ADF4351_RDIV2_DEF				ADF4351_RDIV2_DISABLED
-#define ADF4351_REFDBL_DEF				ADF4351_REFDBL_DISABLED
-#define ADF4351_R_COUNT_DEF				1
+#define ADF4351_VCO_BANDSEL_FREQ_MAX	0.125f // MHz
+
+#define ADF4351_FDBCKSEL				ADF4351_FDBCKSEL_FUNDAMENTAL
 
 void ADF4351_initPorts();
 void ADF4351_init();
@@ -166,8 +166,11 @@ void ADF4351_setRegister5(byte LD_pinMode); // lock detect pin mode (0 - low, 1 
 void ADF4351_enable();
 void ADF4351_disable();
 void ADF4351_settings(dByte INT, dByte FRAC, dByte MOD, dByte R_count, byte refDbl, byte R_DIV2, byte RF_div);
-float ADF4351_VCO_freq(dByte REF_in, _bool R_DIV2, _bool refDbl, dByte R_count, dByte INT, dByte FRAC, dByte MOD); /* Calculate VCO frequency in [MHz]
+float ADF4351_VCO_freq(float REF_in, _bool R_DIV2, _bool refDbl, dByte R_count, dByte INT, dByte FRAC, dByte MOD); /* Calculate VCO frequency in [MHz]
  	 	REF_in - input frequency [MHz]
+ 	 	other arguments - registers values*/
+float ADF4351_VCO_BS_freq(float REF_in, dByte R_count, byte refDbl, byte R_DIV2, byte bandSelClkDiv); /* Calculate clock frequency for band selection in VCO in [MHz]
+		REF_in - input frequency [MHz]
  	 	other arguments - registers values*/
 _bool isLockDetect();
 

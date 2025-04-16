@@ -1,4 +1,4 @@
-../Core/Src/main.c:120:6:SystemClock_Config	4
-../Core/Src/main.c:72:5:main	4
-../Core/Src/main.c:277:6:MX_USB_OTG_FS_PCD_Init	2
-../Core/Src/main.c:387:6:Error_Handler	1
+../Core/Src/main.c:123:6:SystemClock_Config	4
+../Core/Src/main.c:69:5:main	1
+../Core/Src/main.c:184:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:202:6:Error_Handler	1

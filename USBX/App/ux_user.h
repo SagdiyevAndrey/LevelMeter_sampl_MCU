@@ -144,7 +144,7 @@
 /* Defined, this value represents how many ticks per seconds for a specific hardware platform.
    The default is 1000 indicating 1 tick per millisecond.  */
 
-#define UX_PERIODIC_RATE        1000
+/* #define UX_PERIODIC_RATE     (TX_TIMER_TICKS_PER_SECOND) */
 
 /* Define control transfer timeout value in millisecond.
    The default is 10000 milliseconds.  */
@@ -253,7 +253,7 @@
    is 2048 bytes but can be reduced in memory constrained environments. For cd-rom support in the storage
    class, this value cannot be less than 2048.  */
 
-/* #define UX_SLAVE_REQUEST_DATA_MAX_LENGTH                 2048 */
+#define UX_SLAVE_REQUEST_DATA_MAX_LENGTH                    512
 
 /* Defined, this enables processing of Get String Descriptor requests with zero Language ID.
    The first language ID in the language ID framework will be used if the request has a zero
@@ -426,7 +426,7 @@
 
 /* Defined, this macro disables CDC ACM non-blocking transmission support. */
 
-/* #define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE */
+#define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 
 /* Defined, this macro enables device audio feedback endpoint support.  */
 
@@ -521,7 +521,7 @@
 #endif
 
 /* Defined, this macro will enable the standalone mode of usbx.  */
-#define UX_STANDALONE
+/* #define UX_STANDALONE  */
 
 /* Defined, this macro will remove the FileX dependency of host storage.
    In this mode, sector access is offered instead of directly FileX FX_MEDIA support.

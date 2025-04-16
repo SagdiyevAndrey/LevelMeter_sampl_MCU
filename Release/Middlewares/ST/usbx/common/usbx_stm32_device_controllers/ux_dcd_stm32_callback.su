@@ -1,4 +1,3 @@
-../Middlewares/ST/usbx/common/usbx_stm32_device_controllers/ux_dcd_stm32_callback.c:131:10:_ux_dcd_stm32_setup_isr_pending	24	static
 ../Middlewares/ST/usbx/common/usbx_stm32_device_controllers/ux_dcd_stm32_callback.c:231:6:HAL_PCD_SetupStageCallback	24	static
 ../Middlewares/ST/usbx/common/usbx_stm32_device_controllers/ux_dcd_stm32_callback.c:393:6:HAL_PCD_DataInStageCallback	24	static
 ../Middlewares/ST/usbx/common/usbx_stm32_device_controllers/ux_dcd_stm32_callback.c:589:6:HAL_PCD_DataOutStageCallback	24	static

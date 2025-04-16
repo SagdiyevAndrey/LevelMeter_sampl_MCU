@@ -55,6 +55,9 @@
 #define ADF4351_BITPOS_REG5_RESERVED	19
 #define ADF4351_BITPOS_LDPINMODE		22
 
+#define SEND_DATA_DELAY_MS				10
+#define SETTINGS_REG_DELAY_MS			50
+
 void ADF4351_setDATA(byte level)
 {
 	HAL_GPIO_WritePin(ADF4351_DATA_PORT, ADF4351_DATA_PIN, level);
@@ -77,19 +80,8 @@ void ADF4351_initPorts()
 {
 	GPIO_InitTypeDef GPIO_initStruct = {0};
 
-	//HAL_GPIO_WritePin(ADF4351_MUXOUT_PORT, ADF4351_MUXOUT_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ADF4351_LD_PORT, ADF4351_LD_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ADF4351_CLK_PORT, ADF4351_CLK_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ADF4351_DATA_PORT, ADF4351_DATA_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ADF4351_LE_PORT, ADF4351_LE_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ADF4351_CE_PORT, ADF4351_CE_PIN, GPIO_PIN_RESET);
-
 	GPIO_initStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_initStruct.Pull = GPIO_NOPULL;
-
-	/*GPIO_initStruct.Pin = ADF4351_MUXOUT_PIN;
-	GPIO_initStruct.Mode = GPIO_MODE_INPUT;
-	HAL_GPIO_Init(ADF4351_MUXOUT_PORT, &GPIO_initStruct);*/
 
 	GPIO_initStruct.Pin = ADF4351_LD_PIN;
 	GPIO_initStruct.Mode = GPIO_MODE_INPUT;
@@ -110,16 +102,22 @@ void ADF4351_initPorts()
 	GPIO_initStruct.Pin = ADF4351_CE_PIN;
 	GPIO_initStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	HAL_GPIO_Init(ADF4351_CE_PORT, &GPIO_initStruct);
+
+	HAL_GPIO_WritePin(ADF4351_CLK_PORT, ADF4351_CLK_PIN, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ADF4351_DATA_PORT, ADF4351_DATA_PIN, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ADF4351_LE_PORT, ADF4351_LE_PIN, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(ADF4351_CE_PORT, ADF4351_CE_PIN, GPIO_PIN_RESET);
 }
 void ADF4351_init()
 {
 	ADF4351_initPorts();
-	ADF4351_setLE(PULSE_HIGH);
+	HAL_Delay(20);
+	ADF4351_enable();
+	HAL_Delay(20);
 }
 void ADF4351_sendData(uint data)
 {
 	ADF4351_setCLK(PULSE_LOW);
-	ADF4351_setLE(PULSE_LOW);
 	__asm__("NOP");
 	for (byte i = 0; i < 32; i++) {
 		if (data & MASK_UINT_HIGH_BIT) {
@@ -127,12 +125,22 @@ void ADF4351_sendData(uint data)
 		} else {
 			ADF4351_setDATA(PULSE_LOW);
 		}
+		__asm__("NOP");
 		ADF4351_setCLK(PULSE_HIGH);
 		data <<= 1;
 		__asm__("NOP");
 		ADF4351_setCLK(PULSE_LOW);
 	}
+	__asm__("NOP");
 	ADF4351_setLE(PULSE_HIGH);
+	__asm__("NOP");
+	__asm__("NOP");
+	ADF4351_setLE(PULSE_LOW);
+}
+byte ADF4351_calcBandSelClkDivMax(float REF_in, dByte R_count, byte refDbl, byte R_DIV2)
+{
+	return REF_in * (float)(1 + refDbl) / (ADF4351_VCO_BANDSEL_FREQ_MAX * (float)R_count * (float)(1 + R_DIV2));
+
 }
 void ADF4351_setRegister0(dByte fracValue, dByte intValue)
 {
@@ -253,32 +261,40 @@ void ADF4351_settings(dByte INT, dByte FRAC, dByte MOD, dByte R_count, byte refD
 	byte LDF = ADF4351_LDF_FRAC;
 	byte APB = ADF4351_ABP_6NS;
 	byte psc = ADF4351_PSC_4v5;
+	byte VCO_div = 1;
 	if (FRAC == 0) {
 		LDF = ADF4351_LDF_INT;
 		APB = ADF4351_ABP_3NS;
 	}
-	if (ADF4351_VCO_freq(ADF4351_CLOCKFREQ, R_DIV2, refDbl, R_count, INT, FRAC, MOD) > 3600)
+	if (ADF4351_FDBCKSEL == ADF4351_FDBCKSEL_DIVIDED)
+		VCO_div = RF_div;
+	if (ADF4351_VCO_freq(ADF4351_CLOCKREF, R_DIV2, refDbl, R_count, INT, FRAC, MOD) / (float)VCO_div > 3600.0f)
 		psc = ADF4351_PSC_8v9;
 	ADF4351_setRegister5(ADF4351_LDPINMODE_HIGH);
-	HAL_Delay(50);
+	HAL_Delay(SETTINGS_REG_DELAY_MS);
 	ADF4351_setRegister4(ADF4351_OUTPWR_p5DBM, ADF4351_RFOUT_ENABLED, ADF4351_AUXOUTPWR_n1DBM, ADF4351_AUXOUT_DISABLED,
-			ADF4351_AUXOUTSEL_FUNDAMENTAL, ADF4351_MTLD_DISABLED, ADF4351_VCOPWRDOWN_PWRUP, 80, RF_div, ADF4351_FDBCKSEL_FUNDAMENTAL);
-	HAL_Delay(50);
+			ADF4351_AUXOUTSEL_FUNDAMENTAL, ADF4351_MTLD_DISABLED, ADF4351_VCOPWRDOWN_PWRUP,
+			ADF4351_calcBandSelClkDivMax(ADF4351_CLOCKREF, R_count, refDbl, R_DIV2), RF_div, ADF4351_FDBCKSEL);
+	HAL_Delay(SETTINGS_REG_DELAY_MS);
 	ADF4351_setRegister3(1, ADF4351_CLKDIVMODE_OFF, ADF4351_CSR_DISABLED, ADF4351_CHRGCANCEL_DISABLED, APB, ADF4351_BANDSELCLKMODE_LOW);
-	HAL_Delay(50);
+	HAL_Delay(SETTINGS_REG_DELAY_MS);
 	ADF4351_setRegister2(ADF4351_COUNTRST_DISABLED, ADF4351_CP3STATE_DISABLED, ADF4351_PWRDOWN_DISABLED, ADF4351_PDPOLARITY_POSITIVE,
 			ADF4351_LDP_6NS, LDF, ADF4351_CHRGPUMPCURSET_2500U, ADF4351_DBLBUF_DISABLED, R_count, R_DIV2, refDbl, ADF4351_MUXOUT_DGND,
 			ADF4351_LOWNOISEMODE_LOWNOISE);
-	HAL_Delay(50);
+	HAL_Delay(SETTINGS_REG_DELAY_MS);
 	ADF4351_setRegister1(MOD, 1, psc, ADF4351_PHASEADJ_OFF);
-	HAL_Delay(50);
+	HAL_Delay(SETTINGS_REG_DELAY_MS);
 	ADF4351_setRegister0(FRAC, INT);
-	HAL_Delay(50);
+	HAL_Delay(SETTINGS_REG_DELAY_MS);
 }
-float ADF4351_VCO_freq(dByte REF_in, _bool R_DIV2, _bool refDbl, dByte R_count, dByte INT, dByte FRAC, dByte MOD)
+float ADF4351_VCO_freq(float REF_in, _bool R_DIV2, _bool refDbl, dByte R_count, dByte INT, dByte FRAC, dByte MOD)
 {
-	return ((float)REF_in) * (((float)(1 + refDbl)) / (((float)R_count) * ((float)(1 + R_DIV2)))) *
+	return REF_in * (((float)(1 + refDbl)) / (((float)R_count) * ((float)(1 + R_DIV2)))) *
 		   (((float)INT) + ((float)FRAC) / ((float)MOD));
+}
+float ADF4351_VCO_BS_freq(float REF_in, dByte R_count, byte refDbl, byte R_DIV2, byte bandSelClkDiv)
+{
+	return REF_in * (float)(1 + refDbl) / ((float)bandSelClkDiv * (float)R_count * (float)(1 + R_DIV2));
 }
 _bool isLockDetect()
 {
