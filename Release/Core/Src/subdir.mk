@@ -9,7 +9,10 @@ C_SRCS += \
 ../Core/Src/adc.c \
 ../Core/Src/app_threadx.c \
 ../Core/Src/comDef.c \
+../Core/Src/cycleSync.c \
+../Core/Src/gpdma.c \
 ../Core/Src/gpio.c \
+../Core/Src/icache.c \
 ../Core/Src/main.c \
 ../Core/Src/memorymap.c \
 ../Core/Src/spi.c \
@@ -29,7 +32,10 @@ OBJS += \
 ./Core/Src/adc.o \
 ./Core/Src/app_threadx.o \
 ./Core/Src/comDef.o \
+./Core/Src/cycleSync.o \
+./Core/Src/gpdma.o \
 ./Core/Src/gpio.o \
+./Core/Src/icache.o \
 ./Core/Src/main.o \
 ./Core/Src/memorymap.o \
 ./Core/Src/spi.o \
@@ -50,7 +56,10 @@ C_DEPS += \
 ./Core/Src/adc.d \
 ./Core/Src/app_threadx.d \
 ./Core/Src/comDef.d \
+./Core/Src/cycleSync.d \
+./Core/Src/gpdma.d \
 ./Core/Src/gpio.d \
+./Core/Src/icache.d \
 ./Core/Src/main.d \
 ./Core/Src/memorymap.d \
 ./Core/Src/spi.d \
@@ -72,7 +81,7 @@ Core/Src/%.o: ../Core/Src/%.S Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/ADF4351.cyclo ./Core/Src/ADF4351.d ./Core/Src/ADF4351.o ./Core/Src/ADF4351.su ./Core/Src/adc.cyclo ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/adc.su ./Core/Src/app_threadx.cyclo ./Core/Src/app_threadx.d ./Core/Src/app_threadx.o ./Core/Src/app_threadx.su ./Core/Src/comDef.cyclo ./Core/Src/comDef.d ./Core/Src/comDef.o ./Core/Src/comDef.su ./Core/Src/gpio.cyclo ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/memorymap.cyclo ./Core/Src/memorymap.d ./Core/Src/memorymap.o ./Core/Src/memorymap.su ./Core/Src/spi.cyclo ./Core/Src/spi.d ./Core/Src/spi.o ./Core/Src/spi.su ./Core/Src/stm32u5xx_hal_msp.cyclo ./Core/Src/stm32u5xx_hal_msp.d ./Core/Src/stm32u5xx_hal_msp.o ./Core/Src/stm32u5xx_hal_msp.su ./Core/Src/stm32u5xx_hal_timebase_tim.cyclo ./Core/Src/stm32u5xx_hal_timebase_tim.d ./Core/Src/stm32u5xx_hal_timebase_tim.o ./Core/Src/stm32u5xx_hal_timebase_tim.su ./Core/Src/stm32u5xx_it.cyclo ./Core/Src/stm32u5xx_it.d ./Core/Src/stm32u5xx_it.o ./Core/Src/stm32u5xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32u5xx.cyclo ./Core/Src/system_stm32u5xx.d ./Core/Src/system_stm32u5xx.o ./Core/Src/system_stm32u5xx.su ./Core/Src/tx_initialize_low_level.d ./Core/Src/tx_initialize_low_level.o ./Core/Src/usb_otg.cyclo ./Core/Src/usb_otg.d ./Core/Src/usb_otg.o ./Core/Src/usb_otg.su
+	-$(RM) ./Core/Src/ADF4351.cyclo ./Core/Src/ADF4351.d ./Core/Src/ADF4351.o ./Core/Src/ADF4351.su ./Core/Src/adc.cyclo ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/adc.su ./Core/Src/app_threadx.cyclo ./Core/Src/app_threadx.d ./Core/Src/app_threadx.o ./Core/Src/app_threadx.su ./Core/Src/comDef.cyclo ./Core/Src/comDef.d ./Core/Src/comDef.o ./Core/Src/comDef.su ./Core/Src/cycleSync.cyclo ./Core/Src/cycleSync.d ./Core/Src/cycleSync.o ./Core/Src/cycleSync.su ./Core/Src/gpdma.cyclo ./Core/Src/gpdma.d ./Core/Src/gpdma.o ./Core/Src/gpdma.su ./Core/Src/gpio.cyclo ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/icache.cyclo ./Core/Src/icache.d ./Core/Src/icache.o ./Core/Src/icache.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/memorymap.cyclo ./Core/Src/memorymap.d ./Core/Src/memorymap.o ./Core/Src/memorymap.su ./Core/Src/spi.cyclo ./Core/Src/spi.d ./Core/Src/spi.o ./Core/Src/spi.su ./Core/Src/stm32u5xx_hal_msp.cyclo ./Core/Src/stm32u5xx_hal_msp.d ./Core/Src/stm32u5xx_hal_msp.o ./Core/Src/stm32u5xx_hal_msp.su ./Core/Src/stm32u5xx_hal_timebase_tim.cyclo ./Core/Src/stm32u5xx_hal_timebase_tim.d ./Core/Src/stm32u5xx_hal_timebase_tim.o ./Core/Src/stm32u5xx_hal_timebase_tim.su ./Core/Src/stm32u5xx_it.cyclo ./Core/Src/stm32u5xx_it.d ./Core/Src/stm32u5xx_it.o ./Core/Src/stm32u5xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32u5xx.cyclo ./Core/Src/system_stm32u5xx.d ./Core/Src/system_stm32u5xx.o ./Core/Src/system_stm32u5xx.su ./Core/Src/tx_initialize_low_level.d ./Core/Src/tx_initialize_low_level.o ./Core/Src/usb_otg.cyclo ./Core/Src/usb_otg.d ./Core/Src/usb_otg.o ./Core/Src/usb_otg.su
 
 .PHONY: clean-Core-2f-Src
 

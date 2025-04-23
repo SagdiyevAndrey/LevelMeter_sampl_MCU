@@ -18,6 +18,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/app_threadx.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_rcc_ex.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_gpio.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_gpio_ex.h \
+ ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_icache.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_dma.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_dma_ex.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_cortex.h \
@@ -36,8 +37,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/app_threadx.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_usb.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pcd_ex.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h \
- ../Core/Inc/ADF4351.h ../Core/Inc/comDef.h ../Core/Inc/adc.h \
- ../Core/Inc/main.h ../Core/Inc/memorymap.h ../Core/Inc/spi.h \
+ ../Core/Inc/ADF4351.h ../Core/Inc/comDef.h ../Core/Inc/cycleSync.h \
+ ../Core/Inc/main.h ../Core/Inc/adc.h ../Core/Inc/gpdma.h \
+ ../Core/Inc/icache.h ../Core/Inc/memorymap.h ../Core/Inc/spi.h \
  ../Core/Inc/usb_otg.h ../Core/Inc/gpio.h
 ../Core/Inc/app_threadx.h:
 ../Middlewares/ST/threadx/common/inc/tx_api.h:
@@ -60,6 +62,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/app_threadx.h \
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_rcc_ex.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_gpio.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_gpio_ex.h:
+../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_icache.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_dma.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_dma_ex.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_cortex.h:
@@ -80,8 +83,11 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/app_threadx.h \
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h:
 ../Core/Inc/ADF4351.h:
 ../Core/Inc/comDef.h:
-../Core/Inc/adc.h:
+../Core/Inc/cycleSync.h:
 ../Core/Inc/main.h:
+../Core/Inc/adc.h:
+../Core/Inc/gpdma.h:
+../Core/Inc/icache.h:
 ../Core/Inc/memorymap.h:
 ../Core/Inc/spi.h:
 ../Core/Inc/usb_otg.h:

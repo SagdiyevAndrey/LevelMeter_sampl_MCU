@@ -1,0 +1,8 @@
+../Core/Src/cycleSync.c:7:6:sync_enableSync	1
+../Core/Src/cycleSync.c:11:6:sync_disableSync	1
+../Core/Src/cycleSync.c:15:6:sync_start	1
+../Core/Src/cycleSync.c:21:6:sync_enableGate	1
+../Core/Src/cycleSync.c:25:6:sync_disableGate	1
+../Core/Src/cycleSync.c:29:6:sync_settings	3
+../Core/Src/cycleSync.c:46:7:sync_isCycle	1
+../Core/Src/cycleSync.c:50:7:sync_isEnd	1

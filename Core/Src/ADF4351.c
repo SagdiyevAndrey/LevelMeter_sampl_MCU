@@ -64,7 +64,6 @@ void ADF4351_setDATA(byte level)
 }
 void ADF4351_setCLK(byte level)
 {
-
 	HAL_GPIO_WritePin(ADF4351_CLK_PORT, ADF4351_CLK_PIN, level);
 }
 void ADF4351_setLE(byte level)

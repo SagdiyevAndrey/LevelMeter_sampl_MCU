@@ -20,6 +20,8 @@
 #include "app_threadx.h"
 #include "main.h"
 #include "adc.h"
+#include "gpdma.h"
+#include "icache.h"
 #include "memorymap.h"
 #include "spi.h"
 #include "usb_otg.h"
@@ -48,7 +50,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint16_t adcData[200000];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,13 +93,22 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_GPDMA1_Init();
   MX_ADC1_Init();
   MX_SPI3_Init();
   MX_USB_OTG_FS_PCD_Init();
+  MX_ICACHE_Init();
   /* USER CODE BEGIN 2 */
 
   ADF4351_init();
-  ADF4351_settings(128, 0, 100, 1, ADF4351_DBLBUF_DISABLED, ADF4351_RDIV2_ENABLED, ADF4351_RFDIVSEL_64);
+  ADF4351_settings(128, 50, 100, 1, ADF4351_DBLBUF_DISABLED, ADF4351_RDIV2_ENABLED, ADF4351_RFDIVSEL_64);
+
+  sync_enableGate();
+  sync_settings(4);
+
+
+  //GPDMA1_C1CDAR
+  //hdma->Instance->CDAR = &adcData;
   /* USER CODE END 2 */
 
   MX_ThreadX_Init();
@@ -108,6 +119,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  sync_start();
+	  HAL_Delay(5000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
