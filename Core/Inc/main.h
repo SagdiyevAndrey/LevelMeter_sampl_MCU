@@ -31,8 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ADF4351.h"
-#include "cycleSync.h"
+#include "refCtrl.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

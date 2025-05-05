@@ -2,6 +2,7 @@
 #define COMDEF_H
 
 #include <math.h>
+#include <string.h>
 #include "stm32u5xx_hal.h"
 
 #define byte 				unsigned char

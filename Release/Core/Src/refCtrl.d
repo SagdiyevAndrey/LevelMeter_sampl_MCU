@@ -1,5 +1,5 @@
-Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal.o: \
- ../Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal.c \
+Core/Src/refCtrl.o: ../Core/Src/refCtrl.c ../Core/Inc/refCtrl.h \
+ ../Core/Inc/cycleSync.h ../Core/Inc/comDef.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal.h \
  ../Core/Inc/stm32u5xx_hal_conf.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_rcc.h \
@@ -29,7 +29,12 @@ Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal.o: \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pwr_ex.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_tim.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_tim_ex.h \
- ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h
+ ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h \
+ ../Core/Inc/ADF4351.h ../Core/Inc/adc.h ../Core/Inc/main.h \
+ ../Core/Inc/refCtrl.h
+../Core/Inc/refCtrl.h:
+../Core/Inc/cycleSync.h:
+../Core/Inc/comDef.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal.h:
 ../Core/Inc/stm32u5xx_hal_conf.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_rcc.h:
@@ -60,3 +65,7 @@ Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal.o: \
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_tim.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_tim_ex.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h:
+../Core/Inc/ADF4351.h:
+../Core/Inc/adc.h:
+../Core/Inc/main.h:
+../Core/Inc/refCtrl.h:
