@@ -117,6 +117,8 @@
 
 #define ADF4351_FDBCKSEL				ADF4351_FDBCKSEL_FUNDAMENTAL
 
+#define MHZ								1000000
+
 void ADF4351_initPorts();
 void ADF4351_init();
 void ADF4351_sendData(uint data);
@@ -166,6 +168,7 @@ void ADF4351_setRegister5(byte LD_pinMode); // lock detect pin mode (0 - low, 1 
 void ADF4351_enable();
 void ADF4351_disable();
 void ADF4351_settings(dByte INT, dByte FRAC, dByte MOD, dByte R_count, byte refDbl, byte R_DIV2, byte RF_div);
+byte ADF4351_RF_div_val(byte RF_div);
 float ADF4351_VCO_freq(float REF_in, _bool R_DIV2, _bool refDbl, dByte R_count, dByte INT, dByte FRAC, dByte MOD); /* Calculate VCO frequency in [MHz]
  	 	REF_in - input frequency [MHz]
  	 	other arguments - registers values*/

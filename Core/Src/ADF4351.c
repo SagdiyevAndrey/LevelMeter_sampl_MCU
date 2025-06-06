@@ -267,7 +267,7 @@ void ADF4351_settings(dByte INT, dByte FRAC, dByte MOD, dByte R_count, byte refD
 	}
 	if (ADF4351_FDBCKSEL == ADF4351_FDBCKSEL_DIVIDED)
 		VCO_div = RF_div;
-	if (ADF4351_VCO_freq(ADF4351_CLOCKREF, R_DIV2, refDbl, R_count, INT, FRAC, MOD) / (float)VCO_div > 3600.0f)
+	if ((ADF4351_VCO_freq(ADF4351_CLOCKREF, R_DIV2, refDbl, R_count, INT, FRAC, MOD) / (float)ADF4351_RF_div_val(VCO_div)) > 3600.0f)
 		psc = ADF4351_PSC_8v9;
 	ADF4351_setRegister5(ADF4351_LDPINMODE_HIGH);
 	HAL_Delay(SETTINGS_REG_DELAY_MS);
@@ -285,6 +285,10 @@ void ADF4351_settings(dByte INT, dByte FRAC, dByte MOD, dByte R_count, byte refD
 	HAL_Delay(SETTINGS_REG_DELAY_MS);
 	ADF4351_setRegister0(FRAC, INT);
 	HAL_Delay(SETTINGS_REG_DELAY_MS);
+}
+byte ADF4351_RF_div_val(byte RF_div)
+{
+	return (1 << RF_div);
 }
 float ADF4351_VCO_freq(float REF_in, _bool R_DIV2, _bool refDbl, dByte R_count, dByte INT, dByte FRAC, dByte MOD)
 {

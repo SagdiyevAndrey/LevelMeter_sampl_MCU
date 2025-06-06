@@ -14,7 +14,8 @@
 ../Core/Src/ADF4351.c:250:6:ADF4351_enable	0	static
 ../Core/Src/ADF4351.c:110:6:ADF4351_init	8	static
 ../Core/Src/ADF4351.c:254:6:ADF4351_disable	0	static
-../Core/Src/ADF4351.c:289:7:ADF4351_VCO_freq	0	static
+../Core/Src/ADF4351.c:289:6:ADF4351_RF_div_val	0	static
+../Core/Src/ADF4351.c:293:7:ADF4351_VCO_freq	0	static
 ../Core/Src/ADF4351.c:258:6:ADF4351_settings	88	static
-../Core/Src/ADF4351.c:294:7:ADF4351_VCO_BS_freq	0	static
-../Core/Src/ADF4351.c:298:7:isLockDetect	0	static
+../Core/Src/ADF4351.c:298:7:ADF4351_VCO_BS_freq	0	static
+../Core/Src/ADF4351.c:302:7:isLockDetect	0	static

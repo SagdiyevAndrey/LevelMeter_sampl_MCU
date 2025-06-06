@@ -4,6 +4,7 @@
 
 #define FLAG_START_DMA					0x01
 #define FLAG_STOP_ADC					0x02
+#define FLAG_MEAS_CMPL					0x04
 
 uint8_t flags = 0;
 
@@ -15,10 +16,20 @@ uint32_t DMA_nextTrsvLen = 0;
 
 uint32_t ref_testVal = 0;
 
+dByte synt_INT = 0;
+dByte synt_FRAC = 0;
+dByte synt_MOD = 0;
+dByte synt_R_count = 0;
+byte synt_refDbl = 0;
+byte synt_R_div2 = 0;
+byte synt_RF_div = 0;
+
+byte sync_div = 0;
+
 void ADCData_toVolts()
 {
 	float coef = REF_ADC_REF_SUM / (float)(1 << (ref_ADC_bitRate() - 1));
-	for (int i = ref_adcDataSize - 1; i >= 0; i--) {
+	for (uint32_t i = ref_adcDataSize - 1; i >= 0; i--) {
 		float volt = (float)ref_adcData[i] * coef;
 		ref_adcData[i] = *((uint32_t*)(&volt));
 	}
@@ -106,7 +117,7 @@ void ADC_startDMA(ADC_HandleTypeDef* hadc, const uint32_t* pData, uint32_t Lengt
 }
 void ADC_measCpltCallback()
 {
-
+	SET_BIT(flags, FLAG_MEAS_CMPL);
 }
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
@@ -175,26 +186,44 @@ void ref_test_send(uint32_t value)
 }
 void ref_test_measNum()
 {
-	ref_adcDataSize = 0;
+	ref_testVal = 0;
 	for (uint32_t i = 0; i < REF_ADC_DATA_LEN; i++) {
 		if (ref_adcData[i] != 0) {
-			ref_adcDataSize++;
+			ref_testVal++;
 		} else {
 
 		}
 	}
 }
+void ref_sync_settings(byte div)
+{
+	sync_div = div;
+	sync_settings(div);
+}
+void ref_synt_settings(dByte INT, dByte FRAC, dByte MOD, dByte R_count, byte refDbl, byte R_DIV2, byte RF_div)
+{
+	synt_INT = INT;
+	synt_FRAC = FRAC;
+	synt_MOD = MOD;
+	synt_R_count = R_count;
+	synt_refDbl = refDbl;
+	synt_R_div2 = R_DIV2;
+	synt_RF_div = RF_div;
+	ADF4351_settings(INT, FRAC, MOD, R_count, refDbl, R_DIV2, RF_div);
+}
 void ref_init(ADC_HandleTypeDef* hadc)
 {
 	ADF4351_init();
-	ADF4351_settings(128, 50, 100, 1, ADF4351_DBLBUF_DISABLED, ADF4351_RDIV2_ENABLED, ADF4351_RFDIVSEL_64);
+	ref_synt_settings(REF_SYNT_INT, REF_SYNT_FRAC, REF_SYNT_MOD, REF_SYNT_R_COUNT,
+			          REF_SYNT_REF_DBL, REF_SYNT_R_DIV2, REF_SYNT_RF_DIV);
 	sync_enableGate();
-	sync_settings(REF_SYNC_DIV);
+	ref_sync_settings(REF_SYNC_DIV);
 	ref_hadc = hadc;
 }
 void ref_cycle()
 {
 	if (flags & FLAG_START_DMA) {
+		CLEAR_BIT(flags, FLAG_START_DMA);
 		if (REF_DMA_TRSV_LEN_MAX < DMA_nextTrsvLen) {
 			meas_start_DMA(ref_adcDataSize, REF_DMA_TRSV_LEN_MAX);
 			DMA_nextTrsvLen -= REF_DMA_TRSV_LEN_MAX;
@@ -205,7 +234,6 @@ void ref_cycle()
 			ref_adcDataSize += DMA_nextTrsvLen;
 		}
 		ref_testVal++;
-		CLEAR_BIT(flags, FLAG_START_DMA);
 	}
 	if (flags & FLAG_STOP_ADC) {
 		HAL_ADC_Stop_IT(ref_hadc);
@@ -213,10 +241,9 @@ void ref_cycle()
 		CLEAR_BIT(flags, FLAG_STOP_ADC);
 	}
 }
-
 void ref_measure()
 {
-	uint32_t measSize = 65538;
+	uint32_t measSize = 100000;
 	ref_dataClear();
 	ref_testVal = 0;
 	ref_adcDataSize = 0;
@@ -253,27 +280,54 @@ byte ref_ADC_bitRate()
 	}
 	return 1;
 }
+dByte ref_divider()
+{
+	return (dByte)sync_div * REF_SYNC_PREV_DIV;
+}
+float ref_synt_freq()
+{
+	return ADF4351_VCO_freq(ADF4351_CLOCKREF * MHZ, synt_R_div2, synt_refDbl, synt_R_count, synt_INT, synt_FRAC, synt_MOD)
+			/ (float)ADF4351_RF_div_val(synt_RF_div);
+}
+float ref_synt_period()
+{
+	return 1.0f / ref_synt_freq();
+}
 float ref_df()
 {
-	return 0.0f;
+	return (float)fabs(ref_synt_freq() - ADF4351_CLOCKREF * MHZ);
 }
 float ref_dt()
 {
-	return 0.0f;
+	return (float)fabs(1.0f / ref_synt_freq() - 1.0f / (ADF4351_CLOCKREF * MHZ));
 }
 float ref_df_div()
 {
-	return 0.0f;
+	return ref_df() / (float)ref_divider();
 }
 float ref_dt_div()
 {
-	return 0.0f;
+	return ref_dt() * (float)ref_divider();
 }
-void ref_testValue()
+uint32_t ref_measNum()
+{
+	return (uint32_t)round(1.0f / (ref_synt_freq() * ref_dt()));
+}
+_bool ref_isMeasCompleted()
+{
+	if (flags & FLAG_MEAS_CMPL) {
+		CLEAR_BIT(flags, FLAG_MEAS_CMPL);
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+uint32_t ref_testValue()
 {
 	ref_test_measNum();
-	ref_test_send(ref_adcDataSize);
-	HAL_Delay(10);
-	ref_test_send(ref_testVal);
+	//ref_test_send(ref_adcDataSize);
+	//HAL_Delay(10);
+	//ref_test_send(ref_testVal);
+	return ref_testVal;
 }
 

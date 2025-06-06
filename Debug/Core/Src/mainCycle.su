@@ -1,0 +1,4 @@
+../Core/Src/mainCycle.c:6:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/mainCycle.c:15:6:main_init	8	static
+../Core/Src/mainCycle.c:22:6:main_cmdProc	16	static
+../Core/Src/mainCycle.c:26:6:main_cycle	8	static

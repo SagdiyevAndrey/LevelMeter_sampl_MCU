@@ -26,13 +26,16 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_flash_ex.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pwr.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pwr_ex.h \
+ ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_spi.h \
+ ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_spi_ex.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_tim.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_tim_ex.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h \
- ../Core/Inc/refCtrl.h ../Core/Inc/cycleSync.h ../Core/Inc/comDef.h \
- ../Core/Inc/ADF4351.h ../Core/Inc/adc.h ../Core/Inc/main.h \
- ../Core/Inc/adc.h ../Core/Inc/gpdma.h ../Core/Inc/icache.h \
- ../Core/Inc/memorymap.h ../Core/Inc/tim.h ../Core/Inc/gpio.h
+ ../Core/Inc/mainCycle.h ../Core/Inc/refCtrl.h ../Core/Inc/cycleSync.h \
+ ../Core/Inc/comDef.h ../Core/Inc/ADF4351.h ../Core/Inc/adc.h \
+ ../Core/Inc/main.h ../Core/Inc/tim.h ../Core/Inc/spi.h ../Core/Inc/adc.h \
+ ../Core/Inc/gpdma.h ../Core/Inc/icache.h ../Core/Inc/memorymap.h \
+ ../Core/Inc/spi.h ../Core/Inc/tim.h ../Core/Inc/gpio.h
 ../Core/Inc/main.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal.h:
 ../Core/Inc/stm32u5xx_hal_conf.h:
@@ -61,18 +64,24 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_flash_ex.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pwr.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pwr_ex.h:
+../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_spi.h:
+../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_spi_ex.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_tim.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_tim_ex.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h:
+../Core/Inc/mainCycle.h:
 ../Core/Inc/refCtrl.h:
 ../Core/Inc/cycleSync.h:
 ../Core/Inc/comDef.h:
 ../Core/Inc/ADF4351.h:
 ../Core/Inc/adc.h:
 ../Core/Inc/main.h:
+../Core/Inc/tim.h:
+../Core/Inc/spi.h:
 ../Core/Inc/adc.h:
 ../Core/Inc/gpdma.h:
 ../Core/Inc/icache.h:
 ../Core/Inc/memorymap.h:
+../Core/Inc/spi.h:
 ../Core/Inc/tim.h:
 ../Core/Inc/gpio.h:

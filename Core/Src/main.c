@@ -22,6 +22,7 @@
 #include "gpdma.h"
 #include "icache.h"
 #include "memorymap.h"
+#include "spi.h"
 #include "tim.h"
 #include "gpio.h"
 
@@ -48,22 +49,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-_bool main_TIM6_isSec = FALSE;
-uint16_t main_TIM6_ms = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if (htim->Instance == TIM6) {
-		main_TIM6_ms++;
-		if (main_TIM6_ms >= 1) {
-			main_TIM6_isSec = TRUE;
-			main_TIM6_ms = 0;
-		}
-	}
-}
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -104,14 +96,10 @@ int main(void)
   MX_ADC1_Init();
   MX_ICACHE_Init();
   MX_TIM6_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
+  main_init();
 
-
-
-  ref_init(&hadc1);
-  ref_measure();
-  HAL_Delay(2000);
-  HAL_TIM_Base_Start_IT(&htim6);
 
 
   /* USER CODE END 2 */
@@ -120,11 +108,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  ref_cycle();
-	  if(main_TIM6_isSec) {
-		  ref_testValue();
-		  main_TIM6_isSec = FALSE;
-	  }
+	  main_cycle();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -144,7 +128,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE2) != HAL_OK)
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -157,7 +141,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLMBOOST = RCC_PLLMBOOST_DIV4;
   RCC_OscInitStruct.PLL.PLLM = 4;
-  RCC_OscInitStruct.PLL.PLLN = 16;
+  RCC_OscInitStruct.PLL.PLLN = 24;
   RCC_OscInitStruct.PLL.PLLP = 2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   RCC_OscInitStruct.PLL.PLLR = 2;
@@ -179,7 +163,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB3CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }
