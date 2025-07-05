@@ -5,11 +5,13 @@
 #define FLAG_START_DMA					0x01
 #define FLAG_STOP_ADC					0x02
 #define FLAG_MEAS_CMPL					0x04
+#define FLAG_MEAS_START					0x08
+#define FLAG_MEAS_END					0x10
 
 uint8_t flags = 0;
 
 ADC_HandleTypeDef* ref_hadc = NULL;
-uint32_t ref_adcData[REF_ADC_DATA_LEN];
+uint16_t ref_adcData[REF_ADC_DATA_LEN];
 uint32_t ref_adcDataSize = 0;
 
 uint32_t DMA_nextTrsvLen = 0;
@@ -26,14 +28,14 @@ byte synt_RF_div = 0;
 
 byte sync_div = 0;
 
-void ADCData_toVolts()
+/*void ADCData_toVolts()
 {
 	float coef = REF_ADC_REF_SUM / (float)(1 << (ref_ADC_bitRate() - 1));
 	for (uint32_t i = ref_adcDataSize - 1; i >= 0; i--) {
 		float volt = (float)ref_adcData[i] * coef;
-		ref_adcData[i] = *((uint32_t*)(&volt));
+		ref_adcData[i] = *((uint16_t*)(&volt));
 	}
-}
+}*/
 HAL_StatusTypeDef HAL_ADC_startDMAChannel(ADC_HandleTypeDef* hadc, const uint32_t* pData, uint32_t Length)
 {
 	uint32_t LengthInBytes;
@@ -113,10 +115,10 @@ void ADC_startDMA(ADC_HandleTypeDef* hadc, const uint32_t* pData, uint32_t Lengt
     hadc->DMA_Handle->State = HAL_DMA_STATE_BUSY;
         /* Update the DMA channel error code */
     hadc->DMA_Handle->ErrorCode = HAL_DMA_ERROR_NONE;
-    __HAL_LOCK(hadc->DMA_Handle);
 }
 void ADC_measCpltCallback()
 {
+	sync_disableGate();
 	SET_BIT(flags, FLAG_MEAS_CMPL);
 }
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
@@ -137,15 +139,6 @@ void meas_start_DMA(uint32_t dest_ptr_offset, uint32_t size)
 {
 	ref_hadc->DMA_Handle->XferCpltCallback = HAL_DMA_TrsvCpltCallback;
 	ADC_startDMA(ref_hadc, TO_UINT32_PTR(ref_adcData, dest_ptr_offset), size);
-	//__HAL_ADC_CLEAR_FLAG(ref_hadc, ADC_FLAG_RDY);
-	//MODIFY_REG(ref_hadc->Instance->CR, ADC_CR_BITS_PROPERTY_RS, ADC_CR_ADEN);
-	/* Clear ADC group regular conversion flag and overrun flag               */
-	/* (To ensure of no unknown state from potential previous ADC operations) */
-	//__HAL_ADC_CLEAR_FLAG(ref_hadc, (ADC_FLAG_EOC | ADC_FLAG_EOS | ADC_FLAG_OVR));
-	/* Disable all interruptions before enabling the desired ones */
-	//__HAL_ADC_DISABLE_IT(ref_hadc, (ADC_IT_EOC | ADC_IT_EOS | ADC_IT_OVR));
-	//__HAL_ADC_ENABLE_IT(ref_hadc, ADC_IT_EOC);
-	//MODIFY_REG(ref_hadc->Instance->CR, ADC_CR_BITS_PROPERTY_RS, ADC_CR_ADSTART);
 }
 void meas_start_ADC_DMA(uint32_t size)
 {
@@ -195,6 +188,29 @@ void ref_test_measNum()
 		}
 	}
 }
+
+void ref_meas_ADC(uint32_t measSize) {
+	ref_adcDataSize = 0;
+	if (measSize == 0)
+		return;
+	DMA_nextTrsvLen = 0;
+	if (REF_DMA_TRSV_LEN_MAX < measSize) {
+		DMA_nextTrsvLen = measSize - REF_DMA_TRSV_LEN_MAX;
+		meas_start_ADC_DMA(REF_DMA_TRSV_LEN_MAX);
+		ref_adcDataSize = REF_DMA_TRSV_LEN_MAX;
+	} else {
+		ref_adcDataSize = measSize;
+		meas_start_ADC_DMA(measSize);
+	}
+}
+void ref_IT_meas_start()
+{
+	SET_BIT(flags, FLAG_MEAS_START);
+}
+void ref_IT_meas_end()
+{
+	SET_BIT(flags, FLAG_MEAS_END);
+}
 void ref_sync_settings(byte div)
 {
 	sync_div = div;
@@ -216,7 +232,7 @@ void ref_init(ADC_HandleTypeDef* hadc)
 	ADF4351_init();
 	ref_synt_settings(REF_SYNT_INT, REF_SYNT_FRAC, REF_SYNT_MOD, REF_SYNT_R_COUNT,
 			          REF_SYNT_REF_DBL, REF_SYNT_R_DIV2, REF_SYNT_RF_DIV);
-	sync_enableGate();
+	sync_disableGate();
 	ref_sync_settings(REF_SYNC_DIV);
 	ref_hadc = hadc;
 }
@@ -240,22 +256,17 @@ void ref_cycle()
 		ADC_measCpltCallback();
 		CLEAR_BIT(flags, FLAG_STOP_ADC);
 	}
-}
-void ref_measure()
-{
-	uint32_t measSize = 100000;
-	ref_dataClear();
-	ref_testVal = 0;
-	ref_adcDataSize = 0;
-	DMA_nextTrsvLen = 0;
-	if (REF_DMA_TRSV_LEN_MAX < measSize) {
-		DMA_nextTrsvLen = measSize - REF_DMA_TRSV_LEN_MAX;
-		meas_start_ADC_DMA(REF_DMA_TRSV_LEN_MAX);
-		ref_adcDataSize = REF_DMA_TRSV_LEN_MAX;
-	} else {
-		ref_adcDataSize = measSize;
-		meas_start_ADC_DMA(measSize);
+	if (flags & FLAG_MEAS_START) {
+		sync_enableGate();
+		ref_meas_ADC(ref_adcDataSize);
+		CLEAR_BIT(flags, FLAG_MEAS_START);
 	}
+}
+void ref_measure_start(uint32_t measSize)
+{
+	ref_dataClear();
+	ref_adcDataSize = measSize;
+	sync_start();
 }
 void ref_dataClear()
 {
@@ -313,6 +324,17 @@ uint32_t ref_measNum()
 {
 	return (uint32_t)round(1.0f / (ref_synt_freq() * ref_dt()));
 }
+uint32_t ref_ADC_dataSize_byte()
+{
+	return ref_adcDataSize * REF_DMA_TRSV_DATA_WIDTH;
+}
+void ref_ADC_data_turn_val() {
+	for (uint32_t i = ref_adcDataSize - 1; i >= 0; i--) {
+		uint16_t HB = ref_adcData[i] & 0xFF00;
+		ref_adcData[i] >>= 8;
+		ref_adcData[i] |= HB;
+	}
+}
 _bool ref_isMeasCompleted()
 {
 	if (flags & FLAG_MEAS_CMPL) {
@@ -324,10 +346,6 @@ _bool ref_isMeasCompleted()
 }
 uint32_t ref_testValue()
 {
-	ref_test_measNum();
-	//ref_test_send(ref_adcDataSize);
-	//HAL_Delay(10);
-	//ref_test_send(ref_testVal);
 	return ref_testVal;
 }
 

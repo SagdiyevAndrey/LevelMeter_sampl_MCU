@@ -8,11 +8,13 @@
 #ifndef INC_MAINCYCLE_H_
 #define INC_MAINCYCLE_H_
 
+#include "stm32u5xx_hal.h"
 #include "refCtrl.h"
+#include "commands.h"
+#include "adc.h"
 #include "tim.h"
-#include "spi.h"
-
-#define MAIN_SPI_TIMEOUT_MS				1000
+#include "usart.h"
+#include "gpio.h"
 
 void main_init();
 void main_cycle();

@@ -31,4 +31,11 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>ADF4351</name>
+			<type>2</type>
+			<location>D:/Programming/STM32CubeIDE/ADF4351</location>
+		</link>
+	</linkedResources>
 </projectDescription>

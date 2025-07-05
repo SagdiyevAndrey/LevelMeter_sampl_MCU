@@ -22,8 +22,8 @@
 #include "gpdma.h"
 #include "icache.h"
 #include "memorymap.h"
-#include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -96,8 +96,10 @@ int main(void)
   MX_ADC1_Init();
   MX_ICACHE_Init();
   MX_TIM6_Init();
-  MX_SPI3_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
+
+
   main_init();
 
 

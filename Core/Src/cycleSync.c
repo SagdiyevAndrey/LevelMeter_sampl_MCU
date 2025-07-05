@@ -6,17 +6,17 @@
 
 void sync_enableSync()
 {
-	HAL_GPIO_WritePin(SYNC_CLEAR_PORT, SYNC_CLEAR_PIN, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(SYNC_CLEAR_PORT, SYNC_CLEAR_PIN, GPIO_PIN_RESET);
 }
 void sync_disableSync()
 {
-	HAL_GPIO_WritePin(SYNC_CLEAR_PORT, SYNC_CLEAR_PIN, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(SYNC_CLEAR_PORT, SYNC_CLEAR_PIN, GPIO_PIN_SET);
 }
 void sync_start()
 {
-	sync_enableSync();
-	HAL_Delay(RESET_PULSE_DELAY_MS);
 	sync_disableSync();
+	HAL_Delay(RESET_PULSE_DELAY_MS);
+	sync_enableSync();
 }
 void sync_enableGate()
 {
