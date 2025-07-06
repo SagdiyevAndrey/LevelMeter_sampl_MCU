@@ -29,5 +29,5 @@
 ../Core/Src/refCtrl.c:323:10:ref_measNum	16	static
 ../Core/Src/refCtrl.c:327:10:ref_ADC_dataSize_byte	0	static
 ../Core/Src/refCtrl.c:331:6:ref_ADC_data_turn_val	0	static
-../Core/Src/refCtrl.c:338:7:ref_isMeasCompleted	0	static
-../Core/Src/refCtrl.c:347:10:ref_testValue	0	static
+../Core/Src/refCtrl.c:340:7:ref_isMeasCompleted	0	static
+../Core/Src/refCtrl.c:349:10:ref_testValue	0	static

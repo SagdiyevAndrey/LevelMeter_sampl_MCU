@@ -1,9 +1,9 @@
 #include "mainCycle.h"
 
-#define MAIN_IF_DATA_SIZE					1024
-#define MAIN_IF_TRANSMIT_TIMEOUT			1000
+#define MAIN_IF_DATA_SIZE					2048
+#define MAIN_IF_TIMEOUT						1000
 #define IF_FLAG_RECD						0x01
-#define IF_DELAY							8
+#define IF_DELAY							40
 #define TEST_STR_LEN						4
 
 const char str_test[TEST_STR_LEN] = "test";
@@ -43,13 +43,35 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
-void main_IF_transmit(uint8_t* data, uint16_t len) {
+void main_IF_abort()
+{
+	HAL_UART_Abort_IT(uart_hdl);
+}
+uint8_t main_IF_tr_pac(uint8_t* data, uint16_t len) {
 	HAL_Delay(IF_DELAY);
-	HAL_UART_Transmit(uart_hdl, (uint8_t*)&len, sizeof(len), MAIN_IF_TRANSMIT_TIMEOUT);
-	HAL_Delay(IF_DELAY);
-	HAL_UART_Transmit(uart_hdl, data, len, MAIN_IF_TRANSMIT_TIMEOUT);
-	/*HAL_SPI_Transmit(spi_hdl, (uint8_t*)&len, sizeof(len), MAIN_IF_TRANSMIT_TIMEOUT);
-	HAL_SPI_Transmit(spi_hdl, data, len, MAIN_IF_TRANSMIT_TIMEOUT);*/
+	if (HAL_UART_Transmit(uart_hdl, data, len, MAIN_IF_TIMEOUT) == HAL_OK)
+		return TRUE;
+	return FALSE;
+	/*HAL_SPI_Transmit(spi_hdl, (uint8_t*)&len, sizeof(len), MAIN_IF_TRANSMIT_TIMEOUT);*/
+}
+uint8_t main_IF_rec_pac(uint16_t len) {
+	if(HAL_UART_Receive(uart_hdl, IF_data, len, MAIN_IF_TIMEOUT) == HAL_OK)
+		return TRUE;
+	return FALSE;
+}
+void main_IF_transmit(uint8_t* data, uint32_t len) {
+	main_IF_abort();
+	if (!main_IF_tr_pac((uint8_t*)&len, sizeof(len)))
+		return;
+	while (len > MAIN_IF_DATA_SIZE) {
+		if(!main_IF_tr_pac(data, MAIN_IF_DATA_SIZE))
+			return;
+		if(!main_IF_rec_pac(1))
+			return;
+		data += MAIN_IF_DATA_SIZE;
+		len -= MAIN_IF_DATA_SIZE;
+	}
+	main_IF_tr_pac(data, len);
 }
 void main_IF_receive_start() {
 	CLEAR_BIT(IF_flag, IF_FLAG_RECD);
@@ -58,8 +80,7 @@ void main_IF_receive_start() {
 	//HAL_SPI_Receive_IT(spi_hdl, spi_data, spi_dataLen);
 }
 void main_IF_cmd_test() {
-	IF_dataLen = TEST_STR_LEN;
-	main_IF_transmit((uint8_t*)str_test, IF_dataLen);
+	main_IF_transmit((uint8_t*)str_test, TEST_STR_LEN);
 }
 void main_IF_cmd_test_value() {
 	uint32_t val = ref_testValue();
@@ -71,9 +92,18 @@ void main_IF_cmd_test_send_32() {
 void main_IF_cmd_test_send_1024() {
 	main_IF_transmit((uint8_t*)ref_adcData, 1024);
 }
+void main_IF_cmd_test_send_4096() {
+	main_IF_transmit((uint8_t*)ref_adcData, 4096);
+}
+void main_IF_cmd_test_send_20000() {
+	main_IF_transmit((uint8_t*)ref_adcData, 20000);
+}
+void main_IF_cmd_test_send_50000() {
+	main_IF_transmit((uint8_t*)ref_adcData, 50000);
+}
 void main_IF_ref_send() {
-	IF_dataLen = ref_ADC_dataSize_byte();
-	main_IF_transmit((uint8_t*)ref_adcData, IF_dataLen);
+	uint32_t len = ref_ADC_dataSize_byte();
+	main_IF_transmit((uint8_t*)ref_adcData, len);
 }
 
 void main_init()
@@ -97,6 +127,15 @@ void main_cmdProc(byte* data, uint16_t len)
 		case CMD_TEST_SEND_1024:
 			main_IF_cmd_test_send_1024();
 			break;
+		case CMD_TEST_SEND_4096:
+			main_IF_cmd_test_send_4096();
+			break;
+		case CMD_TEST_SEND_20000:
+			main_IF_cmd_test_send_20000();
+			break;
+		case CMD_TEST_SEND_50000:
+			main_IF_cmd_test_send_50000();
+			break;
 		case CMD_MEAS_START:
 			ref_measure_start(1000);
 			break;
@@ -117,7 +156,7 @@ void main_cycle()
 	ref_cycle();
 	main_IF_cycle();
 	if (ref_isMeasCompleted()) {
-		//ref_ADC_data_turn_val();
+		HAL_Delay(200);
 		main_IF_ref_send();
 		main_IF_receive_start();
 	}

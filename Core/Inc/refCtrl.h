@@ -18,7 +18,7 @@
 #define REF_ADC_REF_P					3.3f
 #define REF_ADC_REF_M					0.0f
 #define REF_ADC_REF_SUM					REF_ADC_REF_P - REF_ADC_REF_M
-#define REF_ADC_DATA_LEN				120000
+#define REF_ADC_DATA_LEN				200000
 #define REF_FREQ0_REC					ADF4351_CLOCKREF
 #define REF_SYNC_PREV_DIV				2
 #define REF_DMA_TRSV_DATA_WIDTH			2
@@ -27,7 +27,7 @@
 // Default ADF4351 register values
 #define REF_SYNT_INT					128
 #define REF_SYNT_FRAC					1
-#define REF_SYNT_MOD					1000
+#define REF_SYNT_MOD					400
 #define REF_SYNT_R_COUNT				1
 #define REF_SYNT_REF_DBL				ADF4351_DBLBUF_DISABLED
 #define REF_SYNT_R_DIV2					ADF4351_RDIV2_ENABLED

@@ -329,10 +329,12 @@ uint32_t ref_ADC_dataSize_byte()
 	return ref_adcDataSize * REF_DMA_TRSV_DATA_WIDTH;
 }
 void ref_ADC_data_turn_val() {
-	for (uint32_t i = ref_adcDataSize - 1; i >= 0; i--) {
-		uint16_t HB = ref_adcData[i] & 0xFF00;
+	if (ref_adcDataSize == 0)
+		return;
+	for (uint32_t i = 0; i < ref_adcDataSize; i++) {
+		uint16_t LB = ref_adcData[i] & 0x00FF;
 		ref_adcData[i] >>= 8;
-		ref_adcData[i] |= HB;
+		ref_adcData[i] |= (LB << 8);
 	}
 }
 _bool ref_isMeasCompleted()
